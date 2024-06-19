@@ -5487,7 +5487,7 @@ static void colorformat(int color)
 			color_prev++;
 			}
 
-		if(color_prev > WAVE_COLOR_VIOLET) color_prev = WAVE_COLOR_RED;
+		if(color_prev > WAVE_LAST_COLOR) color_prev = WAVE_FIRST_COLOR;
               	t->t_color = color_prev;
 		}
               fix=1;
@@ -5505,7 +5505,7 @@ static void colorformat(int color)
 }
 
 void
-menu_colorformat_0(gpointer null_data, guint callback_action, GtkWidget *widget)
+menu_colorformat_normal(gpointer null_data, guint callback_action, GtkWidget *widget)
 {
 (void)null_data;
 (void)callback_action;
@@ -5524,7 +5524,7 @@ colorformat(WAVE_COLOR_NORMAL);
 }
 
 void
-menu_colorformat_1(gpointer null_data, guint callback_action, GtkWidget *widget)
+menu_colorformat_red(gpointer null_data, guint callback_action, GtkWidget *widget)
 {
 (void)null_data;
 (void)callback_action;
@@ -5543,7 +5543,7 @@ colorformat(WAVE_COLOR_RED);
 }
 
 void
-menu_colorformat_2(gpointer null_data, guint callback_action, GtkWidget *widget)
+menu_colorformat_orange(gpointer null_data, guint callback_action, GtkWidget *widget)
 {
 (void)null_data;
 (void)callback_action;
@@ -5562,7 +5562,7 @@ colorformat(WAVE_COLOR_ORANGE);
 }
 
 void
-menu_colorformat_3(gpointer null_data, guint callback_action, GtkWidget *widget)
+menu_colorformat_yellow(gpointer null_data, guint callback_action, GtkWidget *widget)
 {
 (void)null_data;
 (void)callback_action;
@@ -5581,7 +5581,7 @@ colorformat(WAVE_COLOR_YELLOW);
 }
 
 void
-menu_colorformat_4(gpointer null_data, guint callback_action, GtkWidget *widget)
+menu_colorformat_green(gpointer null_data, guint callback_action, GtkWidget *widget)
 {
 (void)null_data;
 (void)callback_action;
@@ -5600,7 +5600,7 @@ colorformat(WAVE_COLOR_GREEN);
 }
 
 void
-menu_colorformat_5(gpointer null_data, guint callback_action, GtkWidget *widget)
+menu_colorformat_blue(gpointer null_data, guint callback_action, GtkWidget *widget)
 {
 (void)null_data;
 (void)callback_action;
@@ -5619,7 +5619,7 @@ colorformat(WAVE_COLOR_BLUE);
 }
 
 void
-menu_colorformat_6(gpointer null_data, guint callback_action, GtkWidget *widget)
+menu_colorformat_indigo(gpointer null_data, guint callback_action, GtkWidget *widget)
 {
 (void)null_data;
 (void)callback_action;
@@ -5638,7 +5638,7 @@ colorformat(WAVE_COLOR_INDIGO);
 }
 
 void
-menu_colorformat_7(gpointer null_data, guint callback_action, GtkWidget *widget)
+menu_colorformat_violet(gpointer null_data, guint callback_action, GtkWidget *widget)
 {
 (void)null_data;
 (void)callback_action;
@@ -7826,14 +7826,14 @@ static gtkwave_mlist_t menu_items[] =
     WAVE_GTKIFE("/Edit/Data Format/Fixed Point Shift/Off", NULL, menu_dataformat_fpshift_off,    WV_MENU_FPSHIFTOFF, "<Item>"),
     WAVE_GTKIFE("/Edit/Data Format/Fixed Point Shift/Specify", NULL, menu_dataformat_fpshift_specify,    WV_MENU_FPSHIFTVAL, "<Item>"),
 
-    WAVE_GTKIFE("/Edit/Color Format/Normal", NULL, menu_colorformat_0,    WV_MENU_CLRFMT0, "<Item>"),
-    WAVE_GTKIFE("/Edit/Color Format/Red", NULL, menu_colorformat_1,    WV_MENU_CLRFMT1, "<Item>"),
-    WAVE_GTKIFE("/Edit/Color Format/Orange", NULL, menu_colorformat_2,    WV_MENU_CLRFMT2, "<Item>"),
-    WAVE_GTKIFE("/Edit/Color Format/Yellow", NULL, menu_colorformat_3,    WV_MENU_CLRFMT3, "<Item>"),
-    WAVE_GTKIFE("/Edit/Color Format/Green", NULL, menu_colorformat_4,    WV_MENU_CLRFMT4, "<Item>"),
-    WAVE_GTKIFE("/Edit/Color Format/Blue", NULL, menu_colorformat_5,    WV_MENU_CLRFMT5, "<Item>"),
-    WAVE_GTKIFE("/Edit/Color Format/Indigo", NULL, menu_colorformat_6,    WV_MENU_CLRFMT6, "<Item>"),
-    WAVE_GTKIFE("/Edit/Color Format/Violet", NULL, menu_colorformat_7,    WV_MENU_CLRFMT7, "<Item>"),
+    WAVE_GTKIFE("/Edit/Color Format/Normal", NULL, menu_colorformat_normal,    WV_MENU_CLRFMTNORM, "<Item>"),
+    WAVE_GTKIFE("/Edit/Color Format/Red", NULL, menu_colorformat_red,    WV_MENU_CLRFMTRED, "<Item>"),
+    WAVE_GTKIFE("/Edit/Color Format/Orange", NULL, menu_colorformat_orange,    WV_MENU_CLRFMTORANGE, "<Item>"),
+    WAVE_GTKIFE("/Edit/Color Format/Yellow", NULL, menu_colorformat_yellow,    WV_MENU_CLRFMTYELLOW, "<Item>"),
+    WAVE_GTKIFE("/Edit/Color Format/Green", NULL, menu_colorformat_green,    WV_MENU_CLRFMTGREEN, "<Item>"),
+    WAVE_GTKIFE("/Edit/Color Format/Blue", NULL, menu_colorformat_blue,    WV_MENU_CLRFMTBLUE, "<Item>"),
+    WAVE_GTKIFE("/Edit/Color Format/Indigo", NULL, menu_colorformat_indigo,    WV_MENU_CLRFMTINDIGO, "<Item>"),
+    WAVE_GTKIFE("/Edit/Color Format/Violet", NULL, menu_colorformat_violet,    WV_MENU_CLRFMTVIOLET, "<Item>"),
     WAVE_GTKIFE("/Edit/Color Format/Cycle", NULL, menu_colorformat_cyc,    WV_MENU_CLRFMTC, "<Item>"),
     WAVE_GTKIFE("/Edit/Color Format/<separator>", NULL, NULL, WV_MENU_SEP5A, "<Separator>"),
     WAVE_GTKIFE("/Edit/Color Format/Keep xz Colors", NULL, menu_keep_xz_colors, WV_MENU_KEEPXZ, "<ToggleItem>"),
@@ -8367,14 +8367,14 @@ static gtkwave_mlist_t popmenu_items[] =
     WAVE_GTKIFE("/Data Format/Fixed Point Shift/Off", NULL, menu_dataformat_fpshift_off,    WV_MENU_FPSHIFTOFF, "<Item>"),
     WAVE_GTKIFE("/Data Format/Fixed Point Shift/Specify", NULL, menu_dataformat_fpshift_specify,    WV_MENU_FPSHIFTVAL, "<Item>"),
 
-    WAVE_GTKIFE("/Color Format/Normal", NULL, menu_colorformat_0,    WV_MENU_CLRFMT0, "<Item>"),
-    WAVE_GTKIFE("/Color Format/Red", NULL, menu_colorformat_1,    WV_MENU_CLRFMT1, "<Item>"),
-    WAVE_GTKIFE("/Color Format/Orange", NULL, menu_colorformat_2,    WV_MENU_CLRFMT2, "<Item>"),
-    WAVE_GTKIFE("/Color Format/Yellow", NULL, menu_colorformat_3,    WV_MENU_CLRFMT3, "<Item>"),
-    WAVE_GTKIFE("/Color Format/Green", NULL, menu_colorformat_4,    WV_MENU_CLRFMT4, "<Item>"),
-    WAVE_GTKIFE("/Color Format/Blue", NULL, menu_colorformat_5,    WV_MENU_CLRFMT5, "<Item>"),
-    WAVE_GTKIFE("/Color Format/Indigo", NULL, menu_colorformat_6,    WV_MENU_CLRFMT6, "<Item>"),
-    WAVE_GTKIFE("/Color Format/Violet", NULL, menu_colorformat_7,    WV_MENU_CLRFMT7, "<Item>"),
+    WAVE_GTKIFE("/Color Format/Normal", NULL, menu_colorformat_normal,    WV_MENU_CLRFMTNORM, "<Item>"),
+    WAVE_GTKIFE("/Color Format/Red", NULL, menu_colorformat_red,    WV_MENU_CLRFMTRED, "<Item>"),
+    WAVE_GTKIFE("/Color Format/Orange", NULL, menu_colorformat_orange,    WV_MENU_CLRFMTORANGE, "<Item>"),
+    WAVE_GTKIFE("/Color Format/Yellow", NULL, menu_colorformat_yellow,    WV_MENU_CLRFMTYELLOW, "<Item>"),
+    WAVE_GTKIFE("/Color Format/Green", NULL, menu_colorformat_green,    WV_MENU_CLRFMTGREEN, "<Item>"),
+    WAVE_GTKIFE("/Color Format/Blue", NULL, menu_colorformat_blue,    WV_MENU_CLRFMTBLUE, "<Item>"),
+    WAVE_GTKIFE("/Color Format/Indigo", NULL, menu_colorformat_indigo,    WV_MENU_CLRFMTINDIGO, "<Item>"),
+    WAVE_GTKIFE("/Color Format/Violet", NULL, menu_colorformat_violet,    WV_MENU_CLRFMTVIOLET, "<Item>"),
     WAVE_GTKIFE("/Color Format/Cycle", NULL, menu_colorformat_cyc,    WV_MENU_CLRFMTC, "<Item>"),
     WAVE_GTKIFE("/<separator>", NULL, NULL, WV_MENU_SEP1, "<Separator>"),
     WAVE_GTKIFE("/Insert Analog Height Extension", NULL, menu_insert_analog_height_extension, WV_MENU_EIA, "<Item>"),
