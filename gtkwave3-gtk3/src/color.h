@@ -15,21 +15,27 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
-#define WAVE_COLOR_CYCLE (-1)
-#define WAVE_COLOR_NORMAL (0)
-#define WAVE_COLOR_RED (1)
-#define WAVE_COLOR_ORANGE (2)
-#define WAVE_COLOR_YELLOW (3)
-#define WAVE_COLOR_GREEN (4)
-#define WAVE_COLOR_BLUE (5)
-#define WAVE_COLOR_INDIGO (6)
-#define WAVE_COLOR_VIOLET (7)
+#define WAVE_COLOR_CYCLE    (-1)
+#define WAVE_COLOR_NORMAL   ( 0)
+#define WAVE_COLOR_RED      ( 1)
+#define WAVE_COLOR_ORANGE   ( 2)
+#define WAVE_COLOR_YELLOW   ( 3)
+#define WAVE_COLOR_GREEN    ( 4)
+#define WAVE_COLOR_BLUE     ( 5)
+#define WAVE_COLOR_INDIGO   ( 6)
+#define WAVE_COLOR_VIOLET   ( 7)
+#define WAVE_COLOR_WHITE    ( 8)
+#define WAVE_COLOR_GREY     ( 9)
 
-#define WAVE_NUM_RAINBOW (7)
+#define WAVE_NUM_RAINBOW    ( 9)
 
-#define WAVE_RAINBOW_RGB {0xFF0000, 0xFF7F00, 0xFFFF00, 0x00FF00, 0x0000FF, 0x6600FF, 0x9B00FF}
+#define WAVE_FIRST_COLOR WAVE_COLOR_RED
+#define WAVE_LAST_COLOR WAVE_COLOR_GREY
 
-#define RGB_WAVE_RAINBOW_INITIALIZER {{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0}}
+
+#define WAVE_RAINBOW_RGB {0xFF9090, 0xFF7F00, 0xFFFF00, 0x00FF00, 0x0BF4F4, 0xF40BEC, 0xb040FF, 0xFFFFFF, 0xA0A0A0}
+
+#define RGB_WAVE_RAINBOW_INITIALIZER {{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0},{0.0,0.0,0.0,0.0}}
 
 struct wave_rgb_t
 {

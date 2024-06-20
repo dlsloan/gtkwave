@@ -1843,3 +1843,6 @@
 		Add GDK_WINDOWING_WAYLAND check for gdkwayland.h header usage.
 		Changed	sprintf	to snprintf in fstapi.c.
 		Fix init crash on show_base_symbols enabled.
+3.3.116-eid-0.0.1	Fork off of main code base.
+					Add White and Grey color options.
+					Update color rgb values for easier viewing.

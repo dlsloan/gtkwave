@@ -56,6 +56,8 @@ static const LabeledInt64 COLORS[] = {
     { "Blue", WAVE_COLOR_BLUE },
     { "Indigo", WAVE_COLOR_INDIGO },
     { "Violet", WAVE_COLOR_VIOLET },
+    { "White", WAVE_COLOR_WHITE },
+    { "Grey", WAVE_COLOR_GREY },
     // { "Cycle", WAVE_COLOR_CYCLE },
     {}
 };
