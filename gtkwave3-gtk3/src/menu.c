@@ -6284,25 +6284,28 @@ size_t selected_trace_node_count()
 			if (t->vector)
 			{
 				bvptr bv = t->n.vec;
-				if (bv)
-				{
-					for (size_t j = 0; j < bv->bits->nnbits; j++)
-					{
-						if (bv->bits->nodes[j])
-						{
-							n = bv->bits->nodes[j];
-							if (n->expansion)
-								n = n->expansion->parent;
+				if (!bv)
+					continue;
 
-							if (n)
-								count++;
-						}
+				for (size_t j = 0; j < bv->bits->nnbits; j++)
+				{
+					if (bv->bits->nodes[j])
+					{
+						n = bv->bits->nodes[j];
+						if (n->expansion)
+							n = n->expansion->parent;
+
+						if (n)
+							count++;
 					}
 				}
 			}
 			else
 			{
 				n = t->n.nd;
+				if (!n)
+					continue;
+
 				if (n->expansion)
 					n = n->expansion->parent;
 
@@ -6328,23 +6331,23 @@ size_t selected_trace_nodes(struct npos *nodes, size_t len)
 			if (t->vector)
 			{
 				bvptr bv = t->n.vec;
-				if (bv)
-				{
-					for (size_t j = 0; j < bv->bits->nnbits; j++)
-					{
-						if (bv->bits->nodes[j])
-						{
-							n = bv->bits->nodes[j];
-							if (n->expansion)
-								n = n->expansion->parent;
+				if (!bv)
+					continue;
 
-							if (n)
-							{
-								nodes[count].t = t;
-								nodes[count].n = n;
-								nodes[count].current = &n->head;
-								count++;
-							}
+				for (size_t j = 0; j < bv->bits->nnbits; j++)
+				{
+					if (bv->bits->nodes[j])
+					{
+						n = bv->bits->nodes[j];
+						if (n->expansion)
+							n = n->expansion->parent;
+
+						if (n)
+						{
+							nodes[count].t = t;
+							nodes[count].n = n;
+							nodes[count].current = &n->head;
+							count++;
 						}
 					}
 				}
@@ -6352,6 +6355,9 @@ size_t selected_trace_nodes(struct npos *nodes, size_t len)
 			else
 			{
 				n = t->n.nd;
+				if (!n)
+					continue;
+
 				if (n->expansion)
 					n = n->expansion->parent;
 
