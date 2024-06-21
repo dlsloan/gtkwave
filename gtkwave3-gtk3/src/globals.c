@@ -618,6 +618,7 @@ NULL, /* filesel_scriptfile_menu */
 NULL, /* filesel_writesave 247 */
 NULL, /* filesel_imagegrab */
 0, /* save_success_menu_c_1 248 */
+NULL, /* filesel_csvexport_writesave */
 NULL, /* filesel_vcd_writesave 249 */
 NULL, /* filesel_lxt_writesave 250 */
 NULL, /* filesel_tim_writesave */
@@ -1958,6 +1959,7 @@ void reload_into_new_context_2(void)
 #endif
  new_globals->sst_signal_popup_menu = GLOBALS->sst_signal_popup_menu;
 
+ strcpy2_into_new_context(new_globals, &new_globals->filesel_csvexport_writesave, &GLOBALS->filesel_csvexport_writesave);
  strcpy2_into_new_context(new_globals, &new_globals->filesel_vcd_writesave, &GLOBALS->filesel_vcd_writesave);
  strcpy2_into_new_context(new_globals, &new_globals->filesel_lxt_writesave, &GLOBALS->filesel_lxt_writesave);
  strcpy2_into_new_context(new_globals, &new_globals->filesel_tim_writesave, &GLOBALS->filesel_tim_writesave);

@@ -647,6 +647,7 @@ char *filesel_scriptfile_menu; /* from menu.c */
 char *filesel_writesave; /* from menu.c 264 */
 char *filesel_imagegrab; /* from menu.c */
 char save_success_menu_c_1; /* from menu.c 265 */
+char *filesel_csvexport_writesave; /* from menu.c */
 char *filesel_vcd_writesave; /* from menu.c 266 */
 char *filesel_lxt_writesave; /* from menu.c 267 */
 char *filesel_tim_writesave; /* from menu.c */

@@ -151,6 +151,7 @@ unsigned char v[]; /* C99 */
 
 
 #define MAX_HISTENT_TIME ((TimeType)(~( (ULLDescriptor(-1)) << (sizeof(TimeType) * 8 - 1))))
+#define MIN_HISTENT_TIME ((TimeType)((ULLDescriptor(-1)) << (sizeof(TimeType) * 8 - 1)))
 
 
 typedef struct ExpandInfo	/* only used when expanding atomic vex.. */

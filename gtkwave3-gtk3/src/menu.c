@@ -3681,6 +3681,7 @@ menu_new_viewer_tab_cleanup_2(char *fname, int optimize_vcd)
 #if 0
 		/* disabled for now...these probably would be disruptive */
 		strcpy2_into_new_context(GLOBALS, &GLOBALS->filesel_lxt_writesave, &g_old->filesel_lxt_writesave);
+		strcpy2_into_new_context(GLOBALS, &GLOBALS->filesel_csvexport_writesave, &g_old->filesel_csvexport_writesave);
 		strcpy2_into_new_context(GLOBALS, &GLOBALS->filesel_vcd_writesave, &g_old->filesel_vcd_writesave);
 		strcpy2_into_new_context(GLOBALS, &GLOBALS->filesel_tim_writesave, &g_old->filesel_tim_writesave);
 		strcpy2_into_new_context(GLOBALS, &GLOBALS->filesel_writesave, &g_old->filesel_writesave);
@@ -6263,6 +6264,318 @@ if(GLOBALS->helpbox_is_active)
 dataformat( ~(TR_REAL2BITS|TR_ANALOGMASK), 0 );
 }
 
+struct npos
+{
+	Trptr t;
+	nptr n;
+	hptr current;
+};
+
+size_t selected_trace_node_count()
+{
+	Trptr t = GLOBALS->traces.first;
+	size_t count = 0;
+	nptr n;
+
+	for (Trptr t = GLOBALS->traces.first; t != NULL; t = t->t_next)
+	{
+		if(IsSelected(t) && !IsShadowed(t))
+		{
+			if (t->vector)
+			{
+				bvptr bv = t->n.vec;
+				if (!bv)
+					continue;
+
+				for (size_t j = 0; j < bv->bits->nnbits; j++)
+				{
+					if (bv->bits->nodes[j])
+					{
+						n = bv->bits->nodes[j];
+						if (n->expansion)
+							n = n->expansion->parent;
+
+						if (n)
+							count++;
+					}
+				}
+			}
+			else
+			{
+				n = t->n.nd;
+				if (!n)
+					continue;
+
+				if (n->expansion)
+					n = n->expansion->parent;
+
+				if (n)
+					count++;
+			}
+		}
+	}
+
+	return count;
+}
+
+size_t selected_trace_nodes(struct npos *nodes, size_t len)
+{
+	Trptr t = GLOBALS->traces.first;
+	size_t count = 0;
+	nptr n;
+
+	for (Trptr t = GLOBALS->traces.first; t != NULL; t = t->t_next)
+	{
+		if(IsSelected(t) && !IsShadowed(t))
+		{
+			if (t->vector)
+			{
+				bvptr bv = t->n.vec;
+				if (!bv)
+					continue;
+
+				for (size_t j = 0; j < bv->bits->nnbits; j++)
+				{
+					if (bv->bits->nodes[j])
+					{
+						n = bv->bits->nodes[j];
+						if (n->expansion)
+							n = n->expansion->parent;
+
+						if (n)
+						{
+							nodes[count].t = t;
+							nodes[count].n = n;
+							nodes[count].current = &n->head;
+							count++;
+						}
+					}
+				}
+			}
+			else
+			{
+				n = t->n.nd;
+				if (!n)
+					continue;
+
+				if (n->expansion)
+					n = n->expansion->parent;
+
+				if (n)
+				{
+					nodes[count].t = t;
+					nodes[count].n = n;
+					nodes[count].current = &n->head;
+					count++;
+				}
+			}
+		}
+	}
+
+	return count;
+}
+
+static char *convert_ascii_node(struct npos *n)
+{
+	char *str;
+
+	if (!n->current)
+		return NULL;
+
+	if(n->t->n.nd->extvals)
+	{
+		if(n->current->flags & HIST_REAL)
+		{
+			if(!(n->current->flags & HIST_STRING))
+			{
+#ifdef WAVE_HAS_H_DOUBLE
+				return convert_ascii_real(n->t, &n->current->v.h_double);
+#else
+				return convert_ascii_real(n->t, (double *)n->current->v.h_vector);
+#endif
+			}
+			else
+			{
+				return convert_ascii_string((char *)n->current->v.h_vector);
+			}
+		}
+		else
+		{
+			return convert_ascii_vec(n->t, n->current->v.h_vector);
+		}
+	}
+	else
+	{
+		unsigned char h_val = n->current->v.h_val;
+		if(n->t->n.nd->vartype == ND_VCD_EVENT)
+		{
+			h_val = AN_1; /* generate impulse TODO: probably needs a different string*/
+		}
+
+		str = (char *)calloc_2(1,2*sizeof(char));
+		if(n->t->flags & TR_INVERT)
+		{
+			str[0] = AN_STR_INV[h_val];
+		}
+		else
+		{
+			str[0] = AN_STR[h_val];
+		}
+		return str;
+	}
+}
+
+gboolean inc_nodes_time(TimeType *time, struct npos *nodes, size_t node_count)
+{
+	TimeType orig_time = *time;
+	TimeType min_time = MAX_HISTENT_TIME;
+
+	// Advance nodes incase time isn't min on first entry
+	for (size_t i = 0; i < node_count; i++)
+	{
+		while (nodes[i].current->next && nodes[i].current->next->time <= orig_time)
+			nodes[i].current = nodes[i].current->next;
+	}
+
+	for (size_t i = 0; i < node_count; i++)
+	{
+		if (nodes[i].current->time > orig_time && nodes[i].current->time < min_time)
+			min_time = nodes[i].current->time;
+
+		if (nodes[i].current->next && nodes[i].current->next->time > orig_time && nodes[i].current->next->time < min_time)
+			min_time = nodes[i].current->next->time;
+	}
+
+	if (min_time == MAX_HISTENT_TIME)
+		return FALSE;
+
+	*time = min_time;
+
+	for (size_t i = 0; i < node_count; i++)
+	{
+		// Should only execute once
+		while (nodes[i].current->next && nodes[i].current->next->time <= min_time)
+			nodes[i].current = nodes[i].current->next;
+	}
+
+	return TRUE;
+}
+
+void csvexport_save_helper(const char *savnam, FILE *wave, gboolean include_times)
+{
+	size_t node_count = selected_trace_node_count();
+	struct npos nodes[node_count];
+
+	node_count = selected_trace_nodes(nodes, node_count);
+
+	if (include_times)
+		fprintf(wave, "time,");
+	for (size_t i = 0; i < node_count; i++)
+		fprintf(wave, "%s%s", i == 0 ? "" : ",", nodes[i].t->name);
+	fprintf(wave, "\n");
+
+	TimeType time = MIN_HISTENT_TIME;
+	inc_nodes_time(&time, nodes, node_count);
+
+	do {
+		if (include_times)
+			fprintf(wave, TTFormat ",", time);
+		for (size_t i = 0; i < node_count; i++)
+		{
+			char *str = convert_ascii_node(&nodes[i]);
+			fprintf(wave, "%s%s", i == 0 ? "" : ",", str);
+			free_2(str);
+		}
+		fprintf(wave, "\n");
+	} while (inc_nodes_time(&time, nodes, node_count));
+}
+
+void menu_csvexport_save_cleanup(gboolean include_times)
+{
+	FILE *wave;
+	int len;
+
+	if(!GLOBALS->filesel_ok)
+	{
+		return;
+	}
+
+	len = strlen(*GLOBALS->fileselbox_text);
+#if !defined __MINGW32__ && !defined _MSC_VER
+	if((!len) || ((*GLOBALS->fileselbox_text)[len-1] == '/')
+	   || ((*GLOBALS->fileselbox_text)[len-1] == '\\'))
+#else
+	if((!len) || ((*GLOBALS->fileselbox_text)[len-1] == '/'))
+#endif
+	{
+		GLOBALS->save_success_menu_c_1 = 2;
+		return;
+	}
+
+	if(!(wave=fopen(*GLOBALS->fileselbox_text,"wb")))
+	{
+		fprintf(stderr, "Error opening save file '%s' for writing.\n",*GLOBALS->fileselbox_text);
+		perror("Why");
+		errno=0;
+	}
+	else
+	{
+		csvexport_save_helper(*GLOBALS->fileselbox_text, wave, include_times);
+		GLOBALS->save_success_menu_c_1 = 1;
+		fclose(wave);
+	}
+
+}
+
+void menu_csvexport_valueonly_save_cleanup(GtkWidget *widget, gpointer data)
+{
+	menu_csvexport_save_cleanup(FALSE);
+}
+
+void menu_csvexport_timeseries_save_cleanup(GtkWidget *widget, gpointer data)
+{
+	menu_csvexport_save_cleanup(TRUE);
+}
+
+void
+menu_csvexport_valueonly(gpointer null_data, guint callback_action, GtkWidget *widget)
+{
+(void)null_data;
+(void)callback_action;
+(void)widget;
+
+if(GLOBALS->helpbox_is_active)
+        {
+        help_text_bold("\n\nExport wave vaules in csv format without time information");
+        help_text(
+        " will export all selected trace values in a comma separated value sequence."
+        );
+        return;
+        }
+
+fileselbox("Write CSV File", &GLOBALS->filesel_csvexport_writesave, G_CALLBACK(menu_csvexport_valueonly_save_cleanup), G_CALLBACK(NULL), "*.csv", 1);
+}
+
+void
+menu_csvexport_timeseries(gpointer null_data, guint callback_action, GtkWidget *widget)
+{
+(void)null_data;
+(void)callback_action;
+(void)widget;
+
+if(GLOBALS->helpbox_is_active)
+        {
+        help_text_bold("\n\nExport wave vaules in csv format with time information");
+        help_text(
+        " will export all selected trace values in a comma separated value sequence"
+        " with time in first column."
+        );
+        return;
+        }
+
+fileselbox("Write CSV File", &GLOBALS->filesel_csvexport_writesave, G_CALLBACK(menu_csvexport_timeseries_save_cleanup), G_CALLBACK(NULL), "*.csv", 1);
+}
+
 void
 menu_dataformat_hex(gpointer null_data, guint callback_action, GtkWidget *widget)
 {
@@ -7818,6 +8131,8 @@ static gtkwave_mlist_t menu_items[] =
     WAVE_GTKIFE("/Edit/Combine Down", "F4", menu_combine_down, WV_MENU_ECD, "<Item>"),
     WAVE_GTKIFE("/Edit/Combine Up", "F5", menu_combine_up, WV_MENU_ECU, "<Item>"),
     WAVE_GTKIFE("/Edit/<separator>", NULL, NULL, WV_MENU_SEP5, "<Separator>"),
+	WAVE_GTKIFE("/Edit/CSV Export/Value Only", NULL, menu_csvexport_valueonly, WV_MENU_CSVEXPORT_VALUEONLY, "<Item>"),
+	WAVE_GTKIFE("/Edit/CSV Export/Time Series", NULL, menu_csvexport_timeseries, WV_MENU_CSVEXPORT_TIMESERIES, "<Item>"),
     WAVE_GTKIFE("/Edit/Data Format/Hex", "<Alt>X", menu_dataformat_hex, WV_MENU_EDFH, "<Item>"),
     WAVE_GTKIFE("/Edit/Data Format/Decimal", "<Alt>D", menu_dataformat_dec, WV_MENU_EDFD, "<Item>"),
       /* 30 */
@@ -8362,6 +8677,8 @@ return(0);
 
 static gtkwave_mlist_t popmenu_items[] =
 {
+	WAVE_GTKIFE("/CSV Export/Value Only", NULL, menu_csvexport_valueonly, WV_MENU_CSVEXPORT_VALUEONLY, "<Item>"),
+	WAVE_GTKIFE("/CSV Export/Time Series", NULL, menu_csvexport_timeseries, WV_MENU_CSVEXPORT_TIMESERIES, "<Item>"),
     WAVE_GTKIFE("/Data Format/Hex", NULL, menu_dataformat_hex, WV_MENU_EDFH, "<Item>"),
     WAVE_GTKIFE("/Data Format/Decimal", NULL, menu_dataformat_dec, WV_MENU_EDFD, "<Item>"),
     WAVE_GTKIFE("/Data Format/Signed Decimal", NULL, menu_dataformat_signed, WV_MENU_EDFSD, "<Item>"),

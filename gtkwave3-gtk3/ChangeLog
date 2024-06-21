@@ -1846,3 +1846,4 @@
 3.3.116-eid-0.0.1	Fork off of main code base.
 					Add White and Grey color options.
 					Update color rgb values for easier viewing.
+3.3.116-eid-0.0.2	Add csv export functionality
